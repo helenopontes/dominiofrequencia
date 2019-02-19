@@ -1,29 +1,31 @@
-function [w0,phi0,t,y,mg,kg,Deslocamentos]=fmnv(nos,elems,apoios,my,rho,ast,mi,flag_mass,F)
+function [w0,phi0,t,y,mg,kg,Deslocamentos]=fmnv(nos,elems,apoios,my,rho,ast,mi,flag_mass,F,flag_v_or_t)
 % -------------------------------------------------------------------------
 % FMNV.M
 % -------------------------------------------------------------------------
-% Função de cálculo das frequências e dos modos naturais de vibração.
+% Funcao de calculo das frequenncias e dos modos naturais de vibracao.
 % -------------------------------------------------------------------------
-% Parâmetros:
-%   nos    (E) - Matriz das coordenadas XY dos nós organizadas por coluna.
-%   elems  (E) - Matriz dos nós dos elementos organizados por coluna.
-%   apoios (E) - Matriz das indicações de apoios organizadas por coluna.
-%   my     (E) - Vetor dos módulos de Young das barras.
-%   rho    (E) - Vetor das densidades das barras.
-%   ast    (E) - Vetor das áreas das seções transversais das barras.
-%   flag   (E) - Flag se massa é consistente (1) ou concentrada (0).
-%   w0     (S) - Vetor das frequências naturais de vibração.
-%   phi0   (S) - Matriz dos modos naturais de vibração organizados por
-%                coluna.
+% Parametros:
+%   nos         (E) - Matriz das coordenadas XY dos nos organizadas por coluna.
+%   elems       (E) - Matriz dos nos dos elementos organizados por coluna.
+%   apoios      (E) - Matriz das indicacoes de apoios organizadas por coluna.
+%   my          (E) - Vetor dos modulos de Young das barras.
+%   rho         (E) - Vetor das densidades das barras.
+%   ast         (E) - Vetor das areas das secoes transversais das barras.
+%   flag_mass   (E) - Flag se massa e consistente (1) ou concentrada (0).
+%   flag_v_or_t (E) - Flag se viga (1), se trelica (0)
+%   F           (E) - Vetor de forcas
+%   w0          (S) - Vetor das frequÃªncias naturais de vibracao.
+%   phi0        (S) - Matriz dos modos naturais de vibracao organizados por
+%                     coluna.
 % -------------------------------------------------------------------------
 % Universidade Federal de Alagoas - UFAL
 % -------------------------------------------------------------------------
-% Por: Francisco de Assis Viana Binas Júnior
+% Por: Francisco de Assis Viana Binas Junior
 % -------------------------------------------------------------------------
-% Versão:  19/02/2019
+% Versao:  19/02/2019
 % -------------------------------------------------------------------------
 
-% Monta a matriz dos graus de liberdade dos nós do modelo
+% Monta a matriz dos graus de liberdade dos nos do modelo
 glibn=zeros(size(apoios));
 
 nglib=0;
@@ -42,12 +44,24 @@ kg=zeros(nglib);
 mg=zeros(nglib);
 
 for i=1:size(elems,2)
-    ke=rigidez(my(i),mi(i),nos(:,elems(1,i)),nos(:,elems(2,i)));
+    if flag_v_or_t
+        ke=rigidez_viga(my(i),mi(i),nos(:,elems(1,i)),nos(:,elems(2,i)));
+    else
+        ke=rigidez_trel(my(i),ast(i),nos(:,elems(1,i)),nos(:,elems(2,i)));
+    end
     
     if flag_mass
-        me=massa_cons(rho(i),ast(i),nos(:,elems(1,i)),nos(:,elems(2,i)));
+        if flag_v_or_t
+            me=massa_consis_viga(rho(i),ast(i),nos(:,elems(1,i)),nos(:,elems(2,i)));
+        else
+            me=massa_consis_trel(rho(i),ast(i),nos(:,elems(1,i)),nos(:,elems(2,i)));
+        end
     else
-        me=massa_conc(rho(i),ast(i),nos(:,elems(1,i)),nos(:,elems(2,i)));        
+        if flag_v_or_t
+            me=massa_concen_viga(rho(i),ast(i),nos(:,elems(1,i)),nos(:,elems(2,i)));
+        else
+            me=massa_concen_trel(rho(i),ast(i),nos(:,elems(1,i)),nos(:,elems(2,i)));
+        end
     end
     
     glibe=[glibn(:,elems(1,i));glibn(:,elems(2,i))];
@@ -63,6 +77,8 @@ for i=1:size(elems,2)
         end
     end
 end
+
+mg(4,4) = mg(4,4) + 100;
 
 % Resolve o problema de valor principal generalizado associado
 [phi0aux,w02]=eig(kg,mg);
@@ -83,9 +99,9 @@ end
 Deslocamentos = kg\F;
 
 %---------------------Analise Dinamica-------------------------------------
-%deltat = 1; %Delta t em segundos
+% deltat = 1; %Delta t em segundos
 
-%Primeira e segunda Frequencia Natural:
+% Primeira e segunda Frequencia Natural:
 w1 = w0(1);
 w2 = w0(2);
 
@@ -97,33 +113,33 @@ xx = linsolve(matrizA,vetorb);
 alpha = xx(1);
 beta = xx(2);
 
-%Amortecimento nulo por enquanto
+% Amortecimento nulo por enquanto
 C = alpha.*mg + beta.*kg;
 NumForc = 2*length(F);
 condIniciais = zeros(NumForc,1);
 
 tspan = linspace(0,4,1600);
 
-[t,y] = ode45('func_ode',tspan,condIniciais,[],mg,kg,C,F);
+[t,y] = ode45('func_ode_viga',tspan,condIniciais,[],mg,kg,C,F);
 
 
 
-% ============================ FUNÇÕES LOCAIS =============================
+% ============================ FUNï¿½ï¿½ES LOCAIS =============================
 
 function ke=rigidez_viga(my,mi,noi,nof)
 % -------------------------------------------------------------------------
-% Função de cálculo da matriz de rigidez do elemento de viga 2d.
+% Funcao de calculo da matriz de rigidez do elemento de viga 2d.
 % -------------------------------------------------------------------------
-% Parâmetros:
-%   my  (E) - Módulo de Young ou de elasticidade longitudinal.
-%   mi  (E) - Momento de inércia.
-%   noi (E) - Vetor com as coordenadas XY do nó inicial.
-%   nof (E) - Vetor com as coordenadas XY do nó final.
+% Parametros:
+%   my  (E) - Mï¿½dulo de Young ou de elasticidade longitudinal.
+%   mi  (E) - Momento de inercia.
+%   noi (E) - Vetor com as coordenadas XY do no inicial.
+%   nof (E) - Vetor com as coordenadas XY do no final.
 %   ke  (S) - Matriz de rigidez do elemento.
 % -------------------------------------------------------------------------
 
-xa = nof(1) - noi(1);       %Projeção da barra em x
-ya = nof(2) - noi(2);       %Projeção da barra em y.
+xa = nof(1) - noi(1);       %Projecao da barra em x
+ya = nof(2) - noi(2);       %Projecao da barra em y.
 L = sqrt(xa*xa + ya*ya);    %Comprimento da barra.
 
 ke =[12*my*mi/(L^3) 6*my*mi/(L^2) -12*my*mi/(L^3) 6*my*mi/(L^2);
@@ -134,21 +150,21 @@ ke =[12*my*mi/(L^3) 6*my*mi/(L^2) -12*my*mi/(L^3) 6*my*mi/(L^2);
 
 function ke=rigidez_trel(my,ast,noi,nof)
 % -------------------------------------------------------------------------
-% Função de cálculo da matriz de rigidez do elemento de treliça 2d.
+% Funcao de calculo da matriz de rigidez do elemento de treliï¿½a 2d.
 % -------------------------------------------------------------------------
-% Parâmetros:
-%   my  (E) - Módulo de Young ou de elasticidade longitudinal.
-%   ast (E) - Área da seção transversal.
-%   noi (E) - Vetor com as coordenadas XY do nó inicial.
-%   nof (E) - Vetor com as coordenadas XY do nó final.
+% Parï¿½metros:
+%   my  (E) - Modulo de Young ou de elasticidade longitudinal.
+%   ast (E) - area da secao transversal.
+%   noi (E) - Vetor com as coordenadas XY do no inicial.
+%   nof (E) - Vetor com as coordenadas XY do no final.
 %   ke  (S) - Matriz de rigidez do elemento.
 % -------------------------------------------------------------------------
 
-xa = nof(1) - noi(1);       %Projeção da barra em x
-ya = nof(2) - noi(2);       %Projeção da barra em y.
+xa = nof(1) - noi(1);       %Projecao da barra em x
+ya = nof(2) - noi(2);       %Projecao da barra em y.
 L = sqrt(xa*xa + ya*ya);    %Comprimento da barra.
-C = xa/L;                   %Cosseno do angulo de rotação da barra.
-S = ya/L;                   %Seno do angulo de rotação da barra.
+C = xa/L;                   %Cosseno do angulo de rotacao da barra.
+S = ya/L;                   %Seno do angulo de rotacao da barra.
 ke = (my*ast/L)*...
         [C*C C*S -C*C -C*S;
          C*S S*S -C*S -S*S;
@@ -158,18 +174,18 @@ ke = (my*ast/L)*...
 
 function me=massa_consis_viga(rho,ast,noi,nof)
 % -------------------------------------------------------------------------
-% Função de cálculo da matriz de massa consistente do elemento de viga 2d.
+% Funcao de calculo da matriz de massa consistente do elemento de viga 2d.
 % -------------------------------------------------------------------------
-% Parâmetros:
+% Parametros:
 %   rho (E) - Densidade.
-%   ast (E) - Área da seção transversal.
-%   noi (E) - Vetor com as coordenadas XY do nó inicial.
-%   nof (E) - Vetor com as coordenadas XY do nó final.
+%   ast (E) - area da secao transversal.
+%   noi (E) - Vetor com as coordenadas XY do no inicial.
+%   nof (E) - Vetor com as coordenadas XY do no final.
 %   ke  (S) - Matriz de rigidez do elemento.
 % -------------------------------------------------------------------------
 
-xa = nof(1) - noi(1);       %Projeção da barra em x
-ya = nof(2) - noi(2);       %Projeção da barra em y.
+xa = nof(1) - noi(1);       %Projecao da barra em x
+ya = nof(2) - noi(2);       %Projecao da barra em y.
 L = sqrt(xa*xa + ya*ya);    %Comprimento da barra.
 me = (rho*ast*L/420)*...
         [156 22*L 54 -13*L;
@@ -180,18 +196,18 @@ me = (rho*ast*L/420)*...
 
 function me=massa_concen_viga(rho,ast,noi,nof)
 % -------------------------------------------------------------------------
-% Função de cálculo da matriz de massa concentrada do elemento de viga 2d.
+% Funcao de calculo da matriz de massa concentrada do elemento de viga 2d.
 % -------------------------------------------------------------------------
-% Parâmetros:
+% Parametros:
 %   rho (E) - Densidade.
-%   ast (E) - Área da seção transversal.
-%   noi (E) - Vetor com as coordenadas XY do nó inicial.
-%   nof (E) - Vetor com as coordenadas XY do nó final.
+%   ast (E) - area da secao transversal.
+%   noi (E) - Vetor com as coordenadas XY do no inicial.
+%   nof (E) - Vetor com as coordenadas XY do no final.
 %   ke  (S) - Matriz de rigidez do elemento.
 % -------------------------------------------------------------------------
 
-xa = nof(1) - noi(1);       %Projeção da barra em x
-ya = nof(2) - noi(2);       %Projeção da barra em y.
+xa = nof(1) - noi(1);       %Projecao da barra em x
+ya = nof(2) - noi(2);       %Projecao da barra em y.
 L = sqrt(xa*xa + ya*ya);    %Comprimento da barra.
 me = (rho*ast*L/78)*...
         [39 0 0 0;
@@ -202,19 +218,19 @@ me = (rho*ast*L/78)*...
 
 function me=massa_consis_trel(rho,ast,noi,nof)
 % -------------------------------------------------------------------------
-% Função de cálculo da matriz de massa consistente do elemento de treliça
+% Funcao de calculo da matriz de massa consistente do elemento de trelica
 % 2d.
 % -------------------------------------------------------------------------
-% Parâmetros:
+% Parï¿½metros:
 %   rho (E) - Densidade.
-%   ast (E) - Área da seção transversal.
-%   noi (E) - Vetor com as coordenadas XY do nó inicial.
-%   nof (E) - Vetor com as coordenadas XY do nó final.
+%   ast (E) - area da secao transversal.
+%   noi (E) - Vetor com as coordenadas XY do no inicial.
+%   nof (E) - Vetor com as coordenadas XY do no final.
 %   ke  (S) - Matriz de rigidez do elemento.
 % -------------------------------------------------------------------------
 
-xa = nof(1) - noi(1);       %Projeção da barra em x
-ya = nof(2) - noi(2);       %Projeção da barra em y.
+xa = nof(1) - noi(1);       %Projecao da barra em x
+ya = nof(2) - noi(2);       %Projecao da barra em y.
 L = sqrt(xa*xa + ya*ya);    %Comprimento da barra.
 me = (rho*ast*L/6)*...
         [2 0 1 0;
@@ -225,19 +241,19 @@ me = (rho*ast*L/6)*...
 
 function me=massa_concen_trel(rho,ast,noi,nof)
 % -------------------------------------------------------------------------
-% Função de cálculo da matriz de massa concentrada do elemento de treliça
+% Funcao de calculo da matriz de massa concentrada do elemento de trelica
 % 2d.
 % -------------------------------------------------------------------------
-% Parâmetros:
+% Parï¿½metros:
 %   rho (E) - Densidade.
-%   ast (E) - Área da seção transversal.
-%   noi (E) - Vetor com as coordenadas XY do nó inicial.
-%   nof (E) - Vetor com as coordenadas XY do nó final.
+%   ast (E) - area da secao transversal.
+%   noi (E) - Vetor com as coordenadas XY do no inicial.
+%   nof (E) - Vetor com as coordenadas XY do no final.
 %   ke  (S) - Matriz de rigidez do elemento.
 % -------------------------------------------------------------------------
 
-xa = nof(1) - noi(1);       %Projeção da barra em x
-ya = nof(2) - noi(2);       %Projeção da barra em y.
+xa = nof(1) - noi(1);       %Projecao da barra em x
+ya = nof(2) - noi(2);       %Projecao da barra em y.
 L = sqrt(xa*xa + ya*ya);    %Comprimento da barra.
 me = (rho*ast*L/2)*...
         [1 0 0 0;

@@ -1,43 +1,49 @@
-%function fmnv_ex1
+% EXEMPLO_TREL.M
 % -------------------------------------------------------------------------
-% FMNV_EX1.M
-% -------------------------------------------------------------------------
-% Exemplo de cálculo das frequências e dos modos naturais de vibração de
-% uma treliça 2d apresentada como exemplo 1 (grupo 1) na referência:
-%   Gao, W. "Interval natural frequency and mode shape analysis for truss
-%   structures with interval parameters", Finite Elements in Analysis and
-%   Design, 42, 2006, pp. 471–477
+% Exemplo de calculo das frequencias e dos modos naturais de vibraacao de
+% uma trelica 2d.
 % -------------------------------------------------------------------------
 % Universidade Federal de Alagoas - UFAL
-% Centro de Tecnologia - CTEC
-% Curso de Engenharia de Petróleo - EPET
-% Análise Estrutural de Sistemas Marítimos - EPET073
-% -------------------------------------------------------------------------
-% Por: Eduardo Nobre Lages (enl@lccv.ufal.br)
-% -------------------------------------------------------------------------
-% Versão:  09/08/2017
 % -------------------------------------------------------------------------
 
+clear;
+clc;
+
+% Coordenadas dos nos do elemento
 H=2;
 V=1.5;
-
 nos=[0 H H 2*H; ...
      0 0 V 0];
 
+% Conectividades
 elems=[1 1 2 3 2; ...
        2 3 3 4 4];
-   
+
+% Condicoes de apoios
 apoios=[1 0 0 0; ...
         1 0 0 1];
 
+% Modulo de young E = modulo de elasticidade
 my=1e8*ones(size(elems,2),1);
 
+% Densidade
 rho=2.714e3*ones(size(elems,2),1);
 
+% Area
 ast=4e-2*ones(size(elems,2),1);
 
-% Solução com matriz de massa consistente
-[w0_cons,phi0_cons,kg]=fmnv(nos,elems,apoios,my,rho,ast,1);
+% Momento de inercia I em m2
+mi=1e-3*ones(size(elems,2),1);
+
+
+% Vetor de forcas
+F = zeros(8,1);
+F(4) = -1000;
+
+% Solucao com matriz de massa consistente
+flag_mass = 1;
+flag_v_or_t = 0;
+[w0_cons,phi0_cons,t,y,mg,kg,Deslocamentos]=fmnv(nos,elems,apoios,my,rho,ast, mi,flag_mass,F,flag_v_or_t);
 
 w0_cons
 T_cons=2*pi./w0_cons
@@ -52,7 +58,7 @@ for i=1:2
     end
 end
 
-% Solução com matriz de massa concentrada
+% Solucao com matriz de massa concentrada
 [w0_conc,phi0_conc]=fmnv(nos,elems,apoios,my,rho,ast,0);
 
 w0_conc
