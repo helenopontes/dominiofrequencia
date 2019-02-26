@@ -3,7 +3,7 @@
 function [vx,vy,ax,ay] = onda()
 
 %Parâmetros de Entrada:
-d = 735;                %Lâmina de água em metros
+d = 500;                %Lâmina de água em metros
 ang = 0;                %Ângulo de incidência da onda em graus
 Tz = 9.6;               %Calcular o Tp pela pg 34
 % Tp = 9.2;                 %Período de pico em segundos
@@ -27,7 +27,7 @@ Zd = -10;        %Profundidade em que se deseja saber os espectros de velocidade
 [lambda, k] = ComputeLengthOfWave(d, T, NumberOfWaves, Grav);
 
 %Considerando pw = 1.025 g/cm3, Cd = 0.7, D = 0.5 metros, vc = 2 m/s
-vc = 0.0;
+vc = 2.0;
 Cd = 1.2;
 Di = 0.3048;
 
@@ -38,14 +38,29 @@ n = 1;
 for n=1:NumberOfWaves
     vx(n) = Ampw(n)*W(n)*cosh(k(n)*(Zd+d))/sinh(k(n)*d);
     ax(n) = Ampw(n)*W(n)*W(n)*cosh(k(n)*(Zd+d))/sinh(k(n)*d);
-    vy(n) = Ampw(n)*W(n)*sinh(k(n)*(Zd+d))/sinh(k(n)*d);	
-	ay(n) = Ampw(n)*W(n)*W(n)*sinh(k(n)*(Zd+d))/sinh(k(n)*d);	
+    vy(n) = Ampw(n)*W(n)*sinh(k(n)*(Zd+d))/sinh(k(n)*d);
+    ay(n) = Ampw(n)*W(n)*W(n)*sinh(k(n)*(Zd+d))/sinh(k(n)*d);
+    
+    if (isnan(vx(n)))
+        vx(n) = 0;
+    end
+    if (isnan(vy(n)))
+        vy(n) = 0;
+    end
+    if (isnan(ax(n)))
+        ax(n) = 0;
+    end
+    if (isnan(ay(n)))
+        ay(n) = 0;
+    end
+%   vx(n) = Ampw(n)*W(n)*exp(k(n)*Zd);
+%   vy(n) = Ampw(n)*W(n)*exp(k(n)*Zd);
+%   ax(n) = Ampw(n)*W(n)*W(n)*exp(k(n)*Zd);
+%   ay(n) = -Ampw(n)*W(n)*W(n)*exp(k(n)*Zd);
     %FdNL(n) = (RhoW*1000/2)*Cd*Di*abs(Vxaux+vc)*(Vxaux+vc); %Desta forma a resposta sai em Newtons
     %FdL(n) = (RhoW*1000/2)*Cd*Di*sqrt(2/pi)*2*sigmak*Vxaux;
 end
 
-
-disp('onda!!');
 %desvio1 = std(FdNL);
 %media2 = mean(FdL);
 %desvio2 = std(FdL);

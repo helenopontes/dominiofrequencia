@@ -19,8 +19,8 @@ for i=2:size(vx,2)
         L21=L21+(((vx(i)+ux(i))+(vy(j)+uy(i)))/sqrt(((ux(i)+vx(i))^2)+(uy(j)+vy(j))^2))*VP(vx(i),vy(j),S)*deltavx*deltavy;
         L22=L22+((((vx(i)+ux(i))^2)+2*(vy(j)+uy(i))^2)/sqrt(((ux(i)+vx(i))^2)+(uy(j)+vy(j))^2))*VP(vx(i),vy(j),S)*deltavx*deltavy;
         %Matriz C
-        CX=CX+((1/ux(i))*(sqrt(((ux(i)+vx(i))^2)+(uy(j)+vy(j))^2))*(vx(i)+ux(i)))*VP(vx(i),vy(j),S)*deltavx*deltavy;
-        CY=CY+((1/uy(j))*(sqrt(((ux(i)+vx(i))^2)+(uy(j)+vy(j))^2))*(vy(j)+uy(j)))*VP(vx(i),vy(j),S)*deltavx*deltavy;
+        Cx=Cx+((1/ux(i))*(sqrt(((ux(i)+vx(i))^2)+(uy(j)+vy(j))^2))*(vx(i)+ux(i)))*VP(vx(i),vy(j),S)*deltavx*deltavy;
+        Cy=Cy+((1/uy(j))*(sqrt(((ux(i)+vx(i))^2)+(uy(j)+vy(j))^2))*(vy(j)+uy(j)))*VP(vx(i),vy(j),S)*deltavx*deltavy;
     end
 end
 % 
