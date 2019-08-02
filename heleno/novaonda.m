@@ -1,4 +1,4 @@
-function [vx,vy,ax,ay,vxt,vyt,axt,ayt] = onda(t)
+function [vx,vy,ax,ay,vxt,vyt,axt,ayt] = novaonda(t)
 
 %Parâmetros de Entrada:
 d = 500;                %Lâmina de água em metros

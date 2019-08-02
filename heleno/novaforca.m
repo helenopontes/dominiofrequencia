@@ -1,5 +1,5 @@
-function F = Forca (vxt, vyt, axt, ayt, ro, Cd, D)
-[L,C] = MatrizesLC(vx, vy, ux, uy);
+function F = novaforca (vx, vy, ux, uy, vxt, vyt, axt, ayt, ro, Cd, D)
+[L,C] = MatrizesLC(vxt, vyt, ux, uy);
 
 % for i=1:size(vx,2)
 %     for j=1:size(vy,2)
@@ -8,9 +8,10 @@ function F = Forca (vxt, vyt, axt, ayt, ro, Cd, D)
 %     end
 % end
 
-for tt=0:1:100
-    FD1(tt) = 1/2*ro*Cd*D*((L(1,1)*vxt(tt)+L(1,2)*vyt(tt))+(C(1,1)*axt(tt)+C(1,2)*ayt(tt)));
-    FD2(tt) = 1/2*ro*Cd*D*((L(2,1)*vxt(tt)+L(2,2)*vyt(tt))+(C(2,1)*axt(tt)+C(2,2)*ayt(tt)));
+for tt=1:1:100
+    i=i+1;
+    FD1(i) = 1/2*ro*Cd*D*((L(1,1)*vxt(i)+L(1,2)*vyt(i))+(C(1,1)*ux(tt)+C(1,2)*uy(tt)));
+    FD2(i) = 1/2*ro*Cd*D*((L(2,1)*vxt(i)+L(2,2)*vyt(i))+(C(2,1)*ux(tt)+C(2,2)*uy(tt)));
 end
 
 %for j=1:size(vx,2)
@@ -20,4 +21,4 @@ end
 
 F = [FD1;FD2];
 
-        %CONTINUAR
+      

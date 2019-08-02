@@ -13,14 +13,15 @@ for i=2:size(vx,2)
     deltavx = vx(i)-vx(i-1);
     for j=2:size(vy,2)
         deltavy = vy(j)-vy(j-1);
+        P = VP(vx(i),vy(j),S);
         %Matriz L
-        L11=L11+2*((((vx(i)+ux(i))^2)+(vy(j)+uy(i))^2)/sqrt(((ux(i)+vx(i))^2)+(uy(j)+vy(j))^2))*VP(vx(i),vy(j),S)*deltavx*deltavy;
-        L12=L12+(((vx(i)+ux(i))+(vy(j)+uy(i)))/sqrt(((ux(i)+vx(i))^2)+(uy(j)+vy(j))^2))*VP(vx(i),vy(j),S)*deltavx*deltavy;
-        L21=L21+(((vx(i)+ux(i))+(vy(j)+uy(i)))/sqrt(((ux(i)+vx(i))^2)+(uy(j)+vy(j))^2))*VP(vx(i),vy(j),S)*deltavx*deltavy;
-        L22=L22+((((vx(i)+ux(i))^2)+2*(vy(j)+uy(i))^2)/sqrt(((ux(i)+vx(i))^2)+(uy(j)+vy(j))^2))*VP(vx(i),vy(j),S)*deltavx*deltavy;
+        L11=L11+2*((((vx(i)+ux(i))^2)+(vy(j)+uy(i))^2)/sqrt(((ux(i)+vx(i))^2)+(uy(j)+vy(j))^2))*P*deltavx*deltavy;
+        L12=L12+(((vx(i)+ux(i))+(vy(j)+uy(i)))/sqrt(((ux(i)+vx(i))^2)+(uy(j)+vy(j))^2))*P*deltavx*deltavy;
+        L21=L21+(((vx(i)+ux(i))+(vy(j)+uy(i)))/sqrt(((ux(i)+vx(i))^2)+(uy(j)+vy(j))^2))*P*deltavx*deltavy;
+        L22=L22+((((vx(i)+ux(i))^2)+2*(vy(j)+uy(i))^2)/sqrt(((ux(i)+vx(i))^2)+(uy(j)+vy(j))^2))*P*deltavx*deltavy;
         %Matriz C
-        Cx=Cx+((1/ux(i))*(sqrt(((ux(i)+vx(i))^2)+(uy(j)+vy(j))^2))*(vx(i)+ux(i)))*VP(vx(i),vy(j),S)*deltavx*deltavy;
-        Cy=Cy+((1/uy(j))*(sqrt(((ux(i)+vx(i))^2)+(uy(j)+vy(j))^2))*(vy(j)+uy(j)))*VP(vx(i),vy(j),S)*deltavx*deltavy;
+        Cx=Cx+((1/ux(i))*(sqrt(((ux(i)+vx(i))^2)+(uy(j)+vy(j))^2))*(vx(i)+ux(i)))*P*deltavx*deltavy;
+        Cy=Cy+((1/uy(j))*(sqrt(((ux(i)+vx(i))^2)+(uy(j)+vy(j))^2))*(vy(j)+uy(j)))*P*deltavx*deltavy;
     end
 end
 % 

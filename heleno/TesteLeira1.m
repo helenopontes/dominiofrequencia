@@ -18,10 +18,15 @@ D = 0.3048;
 F = Forca (vx, vy, ux, uy, ro, Cd, D);
 % Passando a resposta do domínio da frequência para o tempo:
 Ft = real(ifft(F(1,:)));
+
+%Fim do testeleira1
 [FdNL,FdL,Vxt]=exemplo1();
 ttt = 1:1:100;
 plot(ttt,FdNL,ttt,FdL,ttt,Ft);
 legend('FdNL','FdL','FLeira');
+figure;
+plot(ttt,FdNL,ttt,FdL);
+legend('FdNL','FdL');
 %Comparando as velocidades
 figure;
 vxwt = real(ifft(vx));

@@ -7,8 +7,8 @@ numWaves = 1;
 freq = Wdi;
 
 while (numWaves <= NumberOfWaves)
-    %RandNumber = (1/32767)*(randi(1,32767)); %FreeMat
-    RandNumber = (1/32767)*(randi(32767));
+    RandNumber = (1/32767)*(randi(1,32767)); %FreeMat
+    %RandNumber = (1/32767)*(randi(32767));
     W(numWaves) = freq + DeltaW/2;
     phase(numWaves) = RandNumber*2*pi;  %Em radianos
     

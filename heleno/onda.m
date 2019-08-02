@@ -1,5 +1,6 @@
 %Programa para cálculo de parâmetros de onda (IRREGULAR sem corrente).
 %Francisco de Assis
+
 function [vx,vy,ax,ay] = onda()
 
 %Parâmetros de Entrada:
