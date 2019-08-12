@@ -1,4 +1,7 @@
-function F = novaforca (vx, vy, ux, uy, vxt, vyt, axt, ayt, ro, Cd, D)
+%function F = novaforca (vx, vy, ux, uy, vxt, vyt, axt, ayt, ro, Cd, D)
+function F = novaforca (ux, uy, vxt, vyt, axt, ayt, ro, Cd, D)
+%[L,C] = MatrizesLC(vx, vy, ux, uy);
+%[L,C] = MatrizesLC(vxt, vyt, zeros(1,size(vxt,2)), zeros(1,size(vxt,2)));
 [L,C] = MatrizesLC(vxt, vyt, ux, uy);
 
 % for i=1:size(vx,2)
@@ -7,11 +10,15 @@ function F = novaforca (vx, vy, ux, uy, vxt, vyt, axt, ayt, ro, Cd, D)
 %         FD2 = FD2 
 %     end
 % end
-
+i=0;
 for tt=1:1:100
     i=i+1;
-    FD1(i) = 1/2*ro*Cd*D*((L(1,1)*vxt(i)+L(1,2)*vyt(i))+(C(1,1)*ux(tt)+C(1,2)*uy(tt)));
-    FD2(i) = 1/2*ro*Cd*D*((L(2,1)*vxt(i)+L(2,2)*vyt(i))+(C(2,1)*ux(tt)+C(2,2)*uy(tt)));
+    %FD1(i) = 1/2*ro*Cd*D*((L(1,1)*vxt(i)+L(1,2)*vyt(i))+(C(1,1)*axt(i)+C(1,2)*ayt(i)));
+    %FD2(i) = 1/2*ro*Cd*D*((L(2,1)*vxt(i)+L(2,2)*vyt(i))+(C(2,1)*axt(i)+C(2,2)*ayt(i)));
+    %FD1(i) = 1/2*ro*Cd*D*((L(1,1)*vxt(i)+L(1,2)*vyt(i)));
+    %FD2(i) = 1/2*ro*Cd*D*((L(2,1)*vxt(i)+L(2,2)*vyt(i)));
+    FD1(i) = 1/2*ro*Cd*D*((L(1,1)*vxt(i)+L(1,2)*vyt(i))+C(1,1)*ux(i));
+    FD2(i) = 1/2*ro*Cd*D*((L(2,1)*vxt(i)+L(2,2)*vyt(i))+C(2,2)*uy(i));    
 end
 
 %for j=1:size(vx,2)
@@ -21,4 +28,4 @@ end
 
 F = [FD1;FD2];
 
-      
+        %CONTINUAR

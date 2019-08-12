@@ -1,4 +1,5 @@
-function [vx,vy,ax,ay,vxt,vyt,axt,ayt] = novaonda(t)
+%function [vx,vy,ax,ay,vxt,vyt,axt,ayt] = novaonda(t)
+function [vxt,vyt,axt,ayt,H, T, W, phase, Ampw] = novaonda(t)
 
 %Parâmetros de Entrada:
 d = 500;                %Lâmina de água em metros
@@ -9,7 +10,7 @@ Tz = 9.6;               %Calcular o Tp pela pg 34
 Tp = Tz/sqrt(6/12);
 
 Hs = 7.6;                 %Altura significativa em metros
-RhoW = 1.025;           %Densidade da água em g/cm^3
+%RhoW = 1.025;           %Densidade da água em g/cm^3
 Grav = 9.80665;         %Gravidade em m/s^2
 NumberOfWaves = 100;     %Número de ondas
 gama = 1.0;             %Parametro de forma para Jonswap
@@ -29,44 +30,70 @@ vc = 2.0;
 Cd = 1.2;
 Di = 0.3048;
 
-t=1;
-n = 1;
 x = 0;
 
-%while (n <= NumberOfWaves)
-for tt=0:1:100
-    vxt(tt)=0;
-    vyt(tt)=0;
-    axt(tt)=0;
-    ayt(tt)=0;
-    
-    for n=1:NumberOfWaves
-        vxt(n) = Ampw(n)*W(n)*cosh(k(n)*(Zd+d))/sinh(k(n)*d)*cos(k*t+W(n)*t);
-        axt(n) = Ampw(n)*W(n)*W(n)*cosh(k(n)*(Zd+d))/sinh(k(n)*d)*sin(k*t+W(n)*t);
-        vyt(n) = Ampw(n)*W(n)*sinh(k(n)*(Zd+d))/sinh(k(n)*d)*sin(k*t+W(n)*t);
-        ayt(n) = Ampw(n)*W(n)*W(n)*sinh(k(n)*(Zd+d))/sinh(k(n)*d)*cos(k*t+W(n)*t);
-    
-        if (isnan(vxt(n)))
-            vxt(n) = 0;
-        end
-        
-        if (isnan(vyt(n)))
-            vyt(n) = 0;
-        end
-        
-        if (isnan(axt(n)))
-            axt(n) = 0;
-        end
-        
-        if (isnan(ayt(n)))
-            ayt(n) = 0;
-        end
-        
-        vxt = vxt(tt)+vxt(n);
-        vyt = vyt(tt)+vyt(n);
-        axt = axt(tt)+axt(n);
-        ayt = ayt(tt)+ayt(n);
-        
-    end      
-
+i=0;
+% for tt=1:1:t
+%     i=i+1;
+%     vxt(i)=0;
+%     vyt(i)=0;
+%     axt(i)=0;
+%     ayt(i)=0;
+%     
+%     for n=1:NumberOfWaves
+%         if tt==1
+%             vx(n) = Ampw(n)*W(n)*cosh(k(n)*(Zd+d))/sinh(k(n)*d);
+%             ax(n) = Ampw(n)*W(n)*W(n)*cosh(k(n)*(Zd+d))/sinh(k(n)*d);
+%             vy(n) = Ampw(n)*W(n)*sinh(k(n)*(Zd+d))/sinh(k(n)*d);
+%             ay(n) = Ampw(n)*W(n)*W(n)*sinh(k(n)*(Zd+d))/sinh(k(n)*d);
+%             if (isnan(vx(n)))
+%                 vx(n) = 0;
+%             end
+%             if (isnan(vy(n)))
+%                 vy(n) = 0;
+%             end
+%             if (isnan(ax(n)))
+%                 ax(n) = 0;
+%             end    
+%             if (isnan(ay(n)))
+%                 ay(n) = 0;
+%             end
+%         end
+% %         Vxt = Ampw(n)*W(n)*cosh(k(n)*(Zd+d))/sinh(k(n)*d)*cos(k(n)*x-W(n)*tt);
+%          Axt = Ampw(n)*W(n)*W(n)*cosh(k(n)*(Zd+d))/sinh(k(n)*d)*sin(k(n)*x-W(n)*tt);
+% %         Vyt = Ampw(n)*W(n)*sinh(k(n)*(Zd+d))/sinh(k(n)*d)*sin(k(n)*x-W(n)*tt);
+%          Ayt = -Ampw(n)*W(n)*W(n)*sinh(k(n)*(Zd+d))/sinh(k(n)*d)*cos(k(n)*x-W(n)*tt);
+%         Vxt = (pi*H(n)/T(n))*exp(k(n)*Zd)*cos(k(n)*x-W(n)*tt);
+%         Vyt = (pi*H(n)/T(n))*exp(k(n)*Zd)*sin(k(n)*x-W(n)*tt);
+%     
+% %         if (isnan(Vxt))
+% %             Vxt = 0;
+% %         end
+%         
+% %         if (isnan(Vyt))
+% %             Vyt = 0;
+% %         end
+%         
+%         if (isnan(Axt))
+%             Axt = 0;
+%         end
+%         
+%         if (isnan(Ayt))
+%             Ayt = 0;
+%         end
+%         
+%         vxt(i) = vxt(i)+Vxt;
+%         vyt(i) = vyt(i)+Vyt;
+%         axt(i) = axt(i)+Axt;
+%         ayt(i) = ayt(i)+Ayt;
+%         
+%     end      
+% 
+% end
+for tt=1:1:t
+    [Vx,Vy] = ComputeVelocityAndAcelerations(H, k, d, Zd, NumberOfWaves, Ampw, W, phase, tt, pos);
+    vxt(tt) = Vx;
+    vyt(tt) = Vy;
+    axt(tt) = 0; %Falta a implementação dos cálculos
+    ayt(tt) = 0;
 end

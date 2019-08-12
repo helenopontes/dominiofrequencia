@@ -1,6 +1,6 @@
 %Programa para cálculo de parâmetros de onda (IRREGULAR sem corrente).
 %Francisco de Assis
-function [FdNL,FdL,Vxt]=exemplo1()
+function [FdNL,FdL,Vxt]=exemplo1(H, T, W, phase, Ampw)
 %Parâmetros de Entrada:
 d = 500;                %Lâmina de água em metros
 ang = 0;                %Ângulo de incidência da onda em graus
@@ -28,7 +28,7 @@ Zd = -10;        %Profundidade em que se deseja saber os espectros de velocidade
 %     Sj(i) = ComputeDensityEnergy(Wd,Hs,Tp,gama);
 % end
 
-[H, T, W, phase, Ampw] = CreateComponentsOfWaves(Tp, NumberOfWaves, Wdi, Wdf, Hs, gama);
+%[H, T, W, phase, Ampw] = CreateComponentsOfWaves(Tp, NumberOfWaves, Wdi, Wdf, Hs, gama);
 
 [lambda, k] = ComputeLengthOfWave(d, T, NumberOfWaves, Grav);
 
@@ -70,7 +70,7 @@ t=1;
 
 while (t <= 100)
     
-    [Vx] = ComputeVelocityAndAcelerations(H, k, d, Zd, NumberOfWaves, Ampw, W, phase, t, pos);
+    [Vx,Vy] = ComputeVelocityAndAcelerations(H, k, d, Zd, NumberOfWaves, Ampw, W, phase, t, pos);
     Vxt(t) = Vx;
     FdNL(t) = (RhoW*1000/2)*Cd*Di*abs(Vx+vc)*(Vx+vc); %Desta forma a resposta sai em Newtons
     FdL(t) = (RhoW*1000/2)*Cd*Di*(B1*Vx + B2*vc);
