@@ -37,8 +37,8 @@ mi=1e-3*ones(size(elems,2),1);
 
 
 % Vetor de forcas
-F = zeros(8,1);
-F(4) = -1000;
+F = zeros(5,1);
+F(2) = -1000;
 
 % Solucao com matriz de massa consistente
 flag_mass = 1;

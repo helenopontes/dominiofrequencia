@@ -1,4 +1,4 @@
-function [w0,phi0,t,y,mg,kg,Deslocamentos]=fmnv(nos,elems,apoios,my,rho,ast,mi,flag_mass,F,flag_v_or_t)
+function [w0,phi0,t1,y1,t2,y2,tt,vt,mg,kg,Deslocamentos]=fmnv_riser_tempo_frequencia(nos,elems,apoios,my,rho,ast,mi,flag_mass,F,flag_v_or_t)
 % -------------------------------------------------------------------------
 % FMNV.M
 % -------------------------------------------------------------------------
@@ -82,7 +82,7 @@ for i=1:size(elems,2)
     end
 end
 
-mg(4,4) = mg(4,4) + 100;
+%mg(4,4) = mg(4,4) + 100;
 
 % Resolve o problema de valor principal generalizado associado
 [phi0aux,w02]=eig(kg,mg);
@@ -124,9 +124,40 @@ C = 0.*mg + 0.*kg;
 NumForc = 2*length(F);
 condIniciais = zeros(NumForc,1);
 
-tspan = linspace(0,4,1600);
+%tspan = linspace(0,4,1600);
+tspan = linspace(0,4,512);
 
-[t,y] = ode45('func_ode_viga',tspan,condIniciais,[],mg,kg,C,F);
+onda_riser;
+Ft = zeros(7,512);
+AuxFt = ones(1,512);
+Ft(2,:) = F(2)*AuxFt;
+Ft(4,:) = F(4)*AuxFt;
+Ft(6,:) = F(6)*AuxFt;
+Ft(7,:) = F(7)*AuxFt;
+
+tt = zeros(1,512);
+t = 0;
+for i=1:1:512
+    tt(i) = t;
+    Ft(1,i) = onda_riser_FDL(t,[0,0,-6]);
+    Ft(3,i) = onda_riser_FDL(t,[0,0,-4]);
+    Ft(5,i) = onda_riser_FDL(t,[0,0,-2]); 
+    t = t + 0.0025;
+end
+
+Ff = zeros(7,512);
+Ff = [fft(Ft(1,:));fft(Ft(2,:));fft(Ft(3,:));fft(Ft(4,:));fft(Ft(5,:));fft(Ft(6,:));fft(Ft(7,:))];
+
+MM = phi0aux'*mg*phi0aux;
+KK = phi0aux'*kg*phi0aux;
+CC = phi0aux'*C*phi0aux;
+
+[vt] = dinamicaFreq_riser(MM,KK,CC,Ff);
+%vt = phi0aux*Vt;
+%vt=0;
+t1=0;y1=0;t2=0;y2=0;
+%[t1,y1] = ode45('func_ode_riser_FDL',tspan,condIniciais,[],mg,kg,C,F);
+%[t2,y2] = ode45('func_ode_riser_FDNL',tspan,condIniciais,[],mg,kg,C,F);
 
 
 

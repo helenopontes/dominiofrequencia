@@ -1,8 +1,4 @@
-%Programa para cálculo de parâmetros de onda (IRREGULAR sem corrente).
-%Francisco de Assis
-function [FdNL,FdL,Vxt]=exemplo1()
-
-[H, T, k, d, Zd, NumberOfWaves, Ampw, W, phase, pos]=GetGlobalWave();
+global H k d Zd NumberOfWaves Ampw W phase RhoW Cd Di vc B1 B2
 
 %Parâmetros de Entrada:
 d = 500;                %Lâmina de água em metros
@@ -17,7 +13,6 @@ RhoW = 1.025;           %Densidade da água em g/cm^3
 Grav = 9.80665;         %Gravidade em m/s^2
 NumberOfWaves = 100;     %Número de ondas
 gama = 1.0;             %Parametro de forma para Jonswap
-pos = [0,0,-10];          %Posição de interesse da superficie de elevacao
 
 Wdi = 0.01;     %Limite inicial para discretizacao do espectro em Hz
 Wdf = 2.0;      %Limite final em Hz
@@ -31,7 +26,7 @@ Zd = -10;        %Profundidade em que se deseja saber os espectros de velocidade
 %     Sj(i) = ComputeDensityEnergy(Wd,Hs,Tp,gama);
 % end
 
-%[H, T, W, phase, Ampw] = CreateComponentsOfWaves(Tp, NumberOfWaves, Wdi, Wdf, Hs, gama);
+[H, T, W, phase, Ampw] = CreateComponentsOfWaves(Tp, NumberOfWaves, Wdi, Wdf, Hs, gama);
 
 [lambda, k] = ComputeLengthOfWave(d, T, NumberOfWaves, Grav);
 
@@ -68,22 +63,3 @@ B2 = 2*sigmaVx*phiX + vc*(1 + 1/(alfa^2))*(2*etaa - 1);
 %Considerando pw = 1.025 g/cm3, Cd = 0.7, D = 0.5 metros, vc = 2 m/s
 Cd = 1.2;
 Di = 0.3048;
-
-t=1;
-
-while (t <= 100)
-    
-    [Vx,Vy] = ComputeVelocityAndAcelerations(H, k, d, Zd, NumberOfWaves, Ampw, W, phase, t, pos);
-    Vxt(t) = Vx;
-    FdNL(t) = (RhoW*1000/2)*Cd*Di*abs(Vx+vc)*(Vx+vc); %Desta forma a resposta sai em Newtons
-    FdL(t) = (RhoW*1000/2)*Cd*Di*(B1*Vx + B2*vc);
-    
-    t = t + 1;
-
-end
-
-
- media1 = mean(FdNL);
-% desvio1 = std(FdNL);
-% media2 = mean(FdL);
-% desvio2 = std(FdL);

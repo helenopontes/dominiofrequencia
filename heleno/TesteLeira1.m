@@ -1,4 +1,4 @@
-clear;clc;
+clear all;clc;
 %input de dados iniciais
 %vx = input('Insira o vetor das velocidades horizontais da onda:');
 %vy = input('Insira o vetor das velocidades verticais da onda:');
@@ -8,10 +8,14 @@ clear;clc;
 %[vx,vy,ax,ay] = onda();
 t = 100.0;
 %[vx,vy,ax,ay,vxt,vyt,axt,ayt] = novaonda(t);
-[vxt,vyt,axt,ayt,H, T, W, phase, Ampw] = novaonda(t);
+%[vxt,vyt,axt,ayt,H, T, W, phase, Ampw] = novaonda(t);
+%[vxt,vyt,axt,ayt,H, T, W, phase, Ampw] = novaonda(t);
+[vxt,vyt] = novaonda(t);
 
 ux = 2*ones([1,size(vxt,2)]);
 uy = 2*ones([1,size(vxt,2)]);
+
+setGlobalCurrent();
 
 %ro = input ('Insira o RhoW');
 ro = 1025;
@@ -24,10 +28,14 @@ D = 0.3048;
 
 %F = Forca (vx, vy, ux, uy, ro, Cd, D);
 %F = novaforca (vx, vy, ux, uy, vxt, vyt, axt, ayt, ro, Cd, D);
-F = novaforca (ux, uy, vxt, vyt, axt, ayt, ro, Cd, D);
-[FdNL,FdL,Vxt]=exemplo1(H, T, W, phase, Ampw);
+F = novaforca (ux, uy, vxt, vyt, ro, Cd, D);
+
+[FdNL,FdL,Vxt]=exemplo1();
 ttt = 1:1:100;
+
+figure;
 plot(ttt,FdNL,'b--',ttt,FdL,'r--',ttt,-F(1,:),'k');
+%plot(ttt,FdNL,'b--',ttt,FdL,'r--',ttt,F(1,:),'k');
 legend('FdNL','FdL','FLeira');
 xlabel('Tempo (s)');
 ylabel('Força (N)');

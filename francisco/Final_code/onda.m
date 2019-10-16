@@ -1,8 +1,8 @@
 %Programa para cálculo de parâmetros de onda (IRREGULAR sem corrente).
 %Francisco de Assis
-function [FdNL,FdL,Vxt]=exemplo1()
 
-[H, T, k, d, Zd, NumberOfWaves, Ampw, W, phase, pos]=GetGlobalWave();
+clear;
+clc;
 
 %Parâmetros de Entrada:
 d = 500;                %Lâmina de água em metros
@@ -31,7 +31,7 @@ Zd = -10;        %Profundidade em que se deseja saber os espectros de velocidade
 %     Sj(i) = ComputeDensityEnergy(Wd,Hs,Tp,gama);
 % end
 
-%[H, T, W, phase, Ampw] = CreateComponentsOfWaves(Tp, NumberOfWaves, Wdi, Wdf, Hs, gama);
+[H, T, W, phase, Ampw] = CreateComponentsOfWaves(Tp, NumberOfWaves, Wdi, Wdf, Hs, gama);
 
 [lambda, k] = ComputeLengthOfWave(d, T, NumberOfWaves, Grav);
 
@@ -71,9 +71,9 @@ Di = 0.3048;
 
 t=1;
 
-while (t <= 100)
+while (t <= 1000)
     
-    [Vx,Vy] = ComputeVelocityAndAcelerations(H, k, d, Zd, NumberOfWaves, Ampw, W, phase, t, pos);
+    [Vx] = ComputeVelocityAndAcelerations(H, k, d, Zd, NumberOfWaves, Ampw, W, phase, t, pos);
     Vxt(t) = Vx;
     FdNL(t) = (RhoW*1000/2)*Cd*Di*abs(Vx+vc)*(Vx+vc); %Desta forma a resposta sai em Newtons
     FdL(t) = (RhoW*1000/2)*Cd*Di*(B1*Vx + B2*vc);
@@ -83,7 +83,7 @@ while (t <= 100)
 end
 
 
- media1 = mean(FdNL);
-% desvio1 = std(FdNL);
-% media2 = mean(FdL);
-% desvio2 = std(FdL);
+media1 = mean(FdNL);
+desvio1 = std(FdNL);
+media2 = mean(FdL);
+desvio2 = std(FdL);

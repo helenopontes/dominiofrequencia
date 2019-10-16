@@ -1,4 +1,4 @@
-function [w0,phi0,t,y,mg,kg,Deslocamentos]=fmnv(nos,elems,apoios,my,rho,ast,mi,flag_mass,F,flag_v_or_t)
+function [w0,phi0,t1,y1,t2,y2,mg,kg,Deslocamentos]=fmnv_riser(nos,elems,apoios,my,rho,ast,mi,flag_mass,F,flag_v_or_t)
 % -------------------------------------------------------------------------
 % FMNV.M
 % -------------------------------------------------------------------------
@@ -82,7 +82,7 @@ for i=1:size(elems,2)
     end
 end
 
-mg(4,4) = mg(4,4) + 100;
+%mg(4,4) = mg(4,4) + 100;
 
 % Resolve o problema de valor principal generalizado associado
 [phi0aux,w02]=eig(kg,mg);
@@ -124,9 +124,13 @@ C = 0.*mg + 0.*kg;
 NumForc = 2*length(F);
 condIniciais = zeros(NumForc,1);
 
-tspan = linspace(0,4,1600);
+%tspan = linspace(0,4,1600);
+tspan = linspace(0,4,512);
 
-[t,y] = ode45('func_ode_viga',tspan,condIniciais,[],mg,kg,C,F);
+onda_riser;
+
+[t1,y1] = ode45('func_ode_riser_FDL',tspan,condIniciais,[],mg,kg,C,F);
+[t2,y2] = ode45('func_ode_riser_FDNL',tspan,condIniciais,[],mg,kg,C,F);
 
 
 

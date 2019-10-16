@@ -1,8 +1,10 @@
 %function F = novaforca (vx, vy, ux, uy, vxt, vyt, axt, ayt, ro, Cd, D)
-function F = novaforca (ux, uy, vxt, vyt, axt, ayt, ro, Cd, D)
+function F = novaforca (ux, uy, vxt, vyt, ro, Cd, D)
 %[L,C] = MatrizesLC(vx, vy, ux, uy);
 %[L,C] = MatrizesLC(vxt, vyt, zeros(1,size(vxt,2)), zeros(1,size(vxt,2)));
-[L,C] = MatrizesLC(vxt, vyt, ux, uy);
+
+%[L,C] = MatrizesLC(vxt, vyt, ux, uy);
+[L,C] = MatrizesLCNovo(vxt, vyt, ux, uy);
 
 % for i=1:size(vx,2)
 %     for j=1:size(vy,2)

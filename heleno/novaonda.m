@@ -1,5 +1,6 @@
 %function [vx,vy,ax,ay,vxt,vyt,axt,ayt] = novaonda(t)
-function [vxt,vyt,axt,ayt,H, T, W, phase, Ampw] = novaonda(t)
+%function [vxt,vyt,axt,ayt,H, T, W, phase, Ampw] = novaonda(t)
+function [vxt,vyt] = novaonda(t)
 
 %Parâmetros de Entrada:
 d = 500;                %Lâmina de água em metros
@@ -90,10 +91,13 @@ i=0;
 %     end      
 % 
 % end
+
+setGlobalWave(H, T, k, d, Zd, NumberOfWaves, Ampw, W, phase, pos);
+
 for tt=1:1:t
-    [Vx,Vy] = ComputeVelocityAndAcelerations(H, k, d, Zd, NumberOfWaves, Ampw, W, phase, tt, pos);
+    [Vx,Vy] = ComputeVelocityAndAcelerations1(tt,tt);
     vxt(tt) = Vx;
     vyt(tt) = Vy;
-    axt(tt) = 0; %Falta a implementação dos cálculos
-    ayt(tt) = 0;
+    %axt(tt) = 0; %Falta a implementação dos cálculos
+    %ayt(tt) = 0;
 end
